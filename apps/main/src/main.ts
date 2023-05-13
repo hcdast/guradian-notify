@@ -41,7 +41,7 @@ async function bootstrap() {
   });
   const { apiServer } = app.get(CONFIG);
   const PORT = apiServer?.port;
-  await app.listen(PORT, 'localhost', async () => {
+  await app.listen(PORT, '0.0.0.0', async () => {
     console.info(`chathouse backend service is running at ${PORT}`, {
       url: await app.getUrl(),
       apiUrl: (await app.getUrl()) + '/apidoc',
