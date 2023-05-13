@@ -1,0 +1,8 @@
+{
+  "env": "huchen",
+  "apiServer": {
+      "port": 8000
+    },
+  "wecom": {
+  }
+}

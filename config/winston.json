@@ -1,0 +1,31 @@
+{
+  "output": [
+    {"transport": "console", "format": "plain"},
+    {"transport": "file", "format": "plain"}
+  ],
+  "file": {
+    "dirname": "logs",
+    "filename": "guradian-notify-%DATE%-%HOSTNAME%.log",
+    "datePattern": "YYYY-MM-DD-HH",
+    "zippedArchive": true,
+    "maxSize": "20m",
+    "maxFiles": "14d",
+    "numBackups": "14"
+  },
+  "errorFile" : {
+    "dirname": "logs",
+    "filename": "guradian-notify-%DATE%-%HOSTNAME%.log",
+    "datePattern": "YYYY-MM-DD-HH",
+    "zippedArchive": true,
+    "maxSize": "1g",
+    "maxFiles": "180d"
+  },
+  "level": "debug",
+  "categories": {
+    "default": {
+    }
+  },
+  "meta": {
+    "service": "guradian-notify"
+  }
+}

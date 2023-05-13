@@ -1,0 +1,31 @@
+{
+  "monorepo": true,
+  "root": "apps/main",
+  "sourceRoot": "apps/main/src",
+  "collection": "@nestjs/schematics",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/main/tsconfig.app.json"
+  },
+  "projects": {
+    "main": {
+      "type": "application",
+      "root": "apps/main",
+      "entryFile": "main",
+      "sourceRoot": "apps/main/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/main/tsconfig.app.json"
+      }
+    },
+    "wecom": {
+      "type": "application",
+      "root": "apps/wecom",
+      "entryFile": "main",
+      "sourceRoot": "apps/wecom/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/wecom/tsconfig.app.json"
+      }
+    }
+  }
+}
