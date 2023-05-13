@@ -13,13 +13,13 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
+import _, { assign } from 'lodash';
 import { AppService } from './app.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { getUid, parserXml2Json } from '@app/common';
 import e, { Request, Response } from 'express';
 import * as wecom_crypto from '@wecom/crypto';
 import { CONFIG } from 'libs/shared/shared.module';
-import _ from 'lodash';
 
 @Controller()
 export class AppController {
@@ -106,7 +106,7 @@ export class AppController {
     const query = req.query;
     const body = req.body;
     try {
-      const params = _.assign(query, body);
+      const params = assign(query, body);
       console.debug('数据回调dataGetCallback params:', JSON.stringify(params));
       const encrypt = params.echostr;
       const decrypt = wecom_crypto.getSignature(
