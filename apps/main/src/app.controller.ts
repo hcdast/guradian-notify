@@ -115,7 +115,9 @@ export class AppController {
         params.nonce,
         encrypt,
       );
-      if (query.msg_signature != decrypt) return 'msg_signature验证失败';
+      console.debug('数据回调dataGetCallback decrypt:', decrypt);
+
+      if (params.msg_signature != decrypt) return 'msg_signature验证失败';
       const result = wecom_crypto.decrypt(this.EncodingAESKey, encrypt);
       console.debug('数据回调dataGetCallback result:', JSON.stringify(result));
       return result?.message;
