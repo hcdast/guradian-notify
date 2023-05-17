@@ -9,10 +9,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { CONFIG, SharedModule } from 'libs/shared/shared.module';
+import { WecomModule } from 'apps/wecom/src/wecom.module';
 
 @Module({
   imports: [
     SharedModule,
+    // WecomModule,
     ClientsModule.register([
       {
         name: 'WECOM_SERVICE',

@@ -66,3 +66,13 @@ export function parserXml2Json(xml: string) {
   }
   return obj;
 }
+
+/**
+ * @description: 生成 min ≤ r ≤ max 随机整数 [min, max]
+ * @param {number} min
+ * @param {number} max
+ * @return {*}
+ */
+export function getRandomRange(min: number, max: number): number {
+  return Math.round(Math.random() * (max - min)) + min;
+}

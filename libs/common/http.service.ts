@@ -6,9 +6,11 @@
  */
 import axios from 'axios';
 import { v4 } from 'uuid';
-// import { getLogger } from './logger';
-const instance = axios.create();
-// const logger = getLogger('HttpClient');
+
+const instance = axios.create({
+  withCredentials: true,
+  timeout: 60000,
+});
 
 function generateRequestId() {
   return v4().slice(-12);
@@ -25,6 +27,7 @@ instance.interceptors.request.use(function (config) {
   });
   return config;
 });
+
 instance.interceptors.response.use(
   function (response) {
     const duration = `${Date.now() - response.config?.['startAt']}ms`;

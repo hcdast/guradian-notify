@@ -8,10 +8,12 @@ import { Module } from '@nestjs/common';
 import { WecomController } from './wecom.controller';
 import { WecomService } from './wecom.service';
 import { SharedModule } from 'libs/shared/shared.module';
+import { TianApiService } from './api/tianApi.service';
+import { TemplateService } from './templates/template.service';
 
 @Module({
   imports: [SharedModule],
   controllers: [WecomController],
-  providers: [WecomService],
+  providers: [WecomService, TianApiService, TemplateService],
 })
 export class WecomModule {}

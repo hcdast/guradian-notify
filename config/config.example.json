@@ -1,8 +1,11 @@
 {
   "env": "huchen",
   "apiServer": {
-      "port": 8000
-    },
+    "port": 8000
+  },
+  "api": {
+    "tian_api_key": ""
+  },
   "wecom": {
   }
 }

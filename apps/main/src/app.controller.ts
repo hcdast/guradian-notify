@@ -48,6 +48,20 @@ export class AppController {
     this.client.emit('setHello', query.name);
   }
 
+  @Get('/data')
+  getData(@Query() query: any) {
+    switch (query.cmd) {
+      case 'getStory':
+        this.client.emit('get-story', '');
+        break;
+      case 'getJoke':
+        this.client.emit('get-joke', '');
+        break;
+      default:
+        break;
+    }
+  }
+
   /**
    * @description: 企微POST数据回调
    * @param {any} req
@@ -108,14 +122,7 @@ export class AppController {
     const query = req.query;
     const body = req.body;
     try {
-      const params = {
-        msg_signature: '0a75fe09ff416e8ae8b5f9de1f1ed4b79f812eca',
-        timestamp: '1683989121',
-        nonce: '1683205689',
-        echostr:
-          'ZqG32J+70qTmvv8lTEAaghNrBDO7in7dzBseS+ZG7I6mGfeQZ3hHwcBlSluXJ6ZbJITCqp5ntOGyyBBhm1ul8w==',
-      };
-      // assign(query, body);
+      const params = assign(query, body);
       console.debug('数据回调dataGetCallback params:', JSON.stringify(params));
       const encrypt = params.echostr;
       const decrypt = wecom_crypto.getSignature(
