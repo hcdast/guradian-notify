@@ -4,10 +4,10 @@
  * @Date: 2023-05-13 10:51:48
  * @Description:
  */
-import express from 'express';
+import * as express from 'express';
 import helmet from 'helmet';
-import bodyParser from 'body-parser';
-import bodyParserXml from 'body-parser-xml';
+import * as bodyParser from 'body-parser';
+import * as bodyParserXml from 'body-parser-xml';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { AllExceptionFilter, ResponseInterceptor } from 'libs/common';
