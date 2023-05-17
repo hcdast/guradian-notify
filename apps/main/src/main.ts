@@ -4,6 +4,10 @@
  * @Date: 2023-05-13 10:51:48
  * @Description:
  */
+import express from 'express';
+import helmet from 'helmet';
+import bodyParser from 'body-parser';
+import bodyParserXml from 'body-parser-xml';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { AllExceptionFilter, ResponseInterceptor } from 'libs/common';
@@ -12,9 +16,16 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { CONFIG } from 'libs/shared/shared.module';
 
 async function bootstrap() {
+  bodyParserXml(bodyParser);
   const app = await NestFactory.create(AppModule, {
     logger: console,
   });
+  app.use(helmet());
+  app.use(express.urlencoded({ extended: false }));
+  app.use(bodyParser.json({ limit: '1mb' }));
+  app.use(bodyParser.urlencoded({ limit: '2mb', extended: true }));
+  app.use(bodyParser.xml());
+
   app.enableCors({
     origin: '*',
     methods: 'POST, GET, PUT, PATCH, OPTIONS, DELETE',
