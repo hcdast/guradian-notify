@@ -10,11 +10,17 @@ import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { CONFIG, SharedModule } from 'libs/shared/shared.module';
 import { WecomModule } from 'apps/wecom/src/wecom.module';
+import { WecomService } from 'apps/wecom/src/wecom.service';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { WecomApiService } from 'apps/wecom/src/api/wecomApi.service';
+import { TianApiService } from 'apps/wecom/src/api/tianApi.service';
+import { TemplateService } from 'apps/wecom/src/templates/template.service';
+import { JuheApiService } from 'apps/wecom/src/api/juheApi.service';
 
 @Module({
   imports: [
+    WecomModule,
     SharedModule,
-    // WecomModule,
     ClientsModule.register([
       {
         name: 'WECOM_SERVICE',
@@ -26,6 +32,14 @@ import { WecomModule } from 'apps/wecom/src/wecom.module';
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    WecomService,
+    SchedulerRegistry,
+    WecomApiService,
+    TianApiService,
+    TemplateService,
+    JuheApiService,
+  ],
 })
 export class AppModule {}

@@ -4,220 +4,135 @@
  * @Date: 2023-05-13 10:57:00
  * @Description:
  */
-import { Controller, Get } from '@nestjs/common';
-import { WecomService } from './wecom.service';
-import { EventPattern, MessagePattern } from '@nestjs/microservices';
-import { TianApiService } from './api/tianApi.service';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  Inject,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
+import { WecomApiService } from './api/wecomApi.service';
 import { getConfig } from '@app/common/getConfig';
-import { TemplateService } from './templates/template.service';
+import { WecomService } from './wecom.service';
+import { getUid, parserXml2Json } from '@app/common';
+import { EventXmlDto } from 'libs/dto/wx.dto';
+import { assign } from 'lodash';
+import e, { Request, Response } from 'express';
+import * as wecom_crypto from '@wecom/crypto';
+import { CONFIG } from 'libs/shared/shared.module';
 
 @Controller('/wecom')
 export class WecomController {
   private readonly msgConfig: any;
+  private Token: string;
+  private EncodingAESKey: string;
   constructor(
+    @Inject(CONFIG) private readonly config: any,
     private readonly wecomService: WecomService,
-    private readonly tianApiService: TianApiService,
-    private readonly templateService: TemplateService,
   ) {
+    this.Token = this.config.wecom?.token;
+    this.EncodingAESKey = this.config.wecom?.encodingAESKey;
     this.msgConfig = getConfig().loveMsg;
   }
 
-  @MessagePattern({ cmd: 'getHello' })
-  getHello(name: string): string {
-    return name;
-  }
-
-  @EventPattern('get-weather')
-  async getWeather() {
+  /**
+   * @description: 企微POST指令回调
+   * @param {any} req
+   * @param {any} res
+   * @return {*}
+   */
+  @Get('/wecom/callback/data')
+  @HttpCode(200)
+  async dataGetCallback(@Req() req: Request, @Res() res: Response) {
+    const query = req.query;
+    const body = req.body;
     try {
-      const weather = await this.tianApiService.getWeather(
-        this.msgConfig.city_name,
+      const params = assign(query, body);
+      console.debug('数据回调dataGetCallback params:', JSON.stringify(params));
+      const encrypt = params.echostr;
+      const decrypt = wecom_crypto.getSignature(
+        this.Token,
+        params.timestamp,
+        params.nonce,
+        encrypt,
       );
-      if (weather) {
-        const lunarInfo = await this.tianApiService.getLunarDate(weather.date);
-        const oneWord = await this.tianApiService.getOneWord();
-        const template = this.templateService.weather({
-          ...weather,
-          lunarInfo,
-        });
-        const { isMoreThan, ...args } = template;
-
-        console.info('weatherInfo', args);
-
-        // 发送消息
-        await this.wecomService.wxNotify(args);
-
-        // 手动开启、或者超出字节自动开启
-        if (this.msgConfig.tips_card_show || isMoreThan) {
-          const tips = this.templateService.importantTips({
-            ...weather,
-            lunarInfo,
-            oneWord,
-          });
-          console.info('weatherInfo tips', tips);
-          if (tips.textcard.description.replace(/\n/g, '').length)
-            await this.wecomService.wxNotify(tips);
-        }
-      }
-    } catch (error) {
-      console.warn('getWeather error:', error);
+      console.debug('数据回调dataGetCallback decrypt:', decrypt);
+      if (params.msg_signature != decrypt) return 'msg_signature验证失败';
+      const result = wecom_crypto.decrypt(this.EncodingAESKey, encrypt);
+      console.debug('数据回调dataGetCallback result:', JSON.stringify(result));
+      return res.send(result.message);
+    } catch (error: any) {
+      console.error('数据回调dataGetCallback error:', error.stack);
     }
   }
 
-  @EventPattern('get-story')
-  async getStory() {
-    const res = await this.tianApiService.getStorybook();
-    const template = {
-      msgtype: 'text',
-      text: {
-        content: `今日份睡前故事来喽：🌑🌒🌓🌔🌕🌝😛\n
-      『${res.title}』
-      ${res.content}`,
-      },
-    };
-    // for (let i = 0; i < res.content.length; i += 500) {
-    //   await this.wecomService.wxNotify(res.content.slice(i, i + 500));
-    // }
-    await this.wecomService.wxNotify(template);
-  }
-
-  @EventPattern('get-goodWord')
-  async getGoodWord() {
+  /**
+   * @description: 企微POST数据回调
+   * @param {any} req
+   * @param {any} res
+   * @return {*}
+   */
+  @Post('/wecom/callback/data')
+  @HttpCode(200)
+  async dataPostCallback(@Req() req: Request, @Res() res: Response) {
+    const { msg_signature, timestamp, nonce } = req.query;
+    const body = req.body;
+    const DebugId = getUid();
+    let decryptRet: any;
+    let message: string;
     try {
-      // 并行请求，优响相应
-      const dataSource = await Promise.allSettled([
-        this.tianApiService.getSaylove(), // 土味情话
-        this.tianApiService.getCaihongpi(), // 彩虹屁
-        this.tianApiService.getOneWord(), // 一言
-        this.tianApiService.getSongLyrics(), // 最美宋词
-        this.tianApiService.getOneMagazines(), // one杂志
-        this.tianApiService.getNetEaseCloud(), // 网易云热评
-        this.tianApiService.getDayEnglish(), // 每日英语
-      ]);
+      console.debug(
+        `${DebugId}-------->数据回调dataPostCallback start<-------- body=${JSON.stringify(
+          body,
+        )}, query=${JSON.stringify(req.query)}`,
+      );
+      const encrypt = (body.xml.Encrypt || body.xml.encrypt)[0];
+      const decrypt = wecom_crypto.getSignature(
+        this.Token,
+        Number(timestamp),
+        Number(nonce),
+        encrypt,
+      );
+      if (msg_signature != decrypt) {
+        message = 'msg_signature验证失败';
+        return;
+      }
+      decryptRet = wecom_crypto.decrypt(this.EncodingAESKey, encrypt);
+      message = decryptRet?.message;
+      const result: any = parserXml2Json(decryptRet.message);
+      console.info(`数据回调dataPostCallback result:${JSON.stringify(result)}`);
+      const xmlData: EventXmlDto = result.xml;
+      const agentId = xmlData.AgentID;
+      const toUserName = xmlData.ToUserName;
+      const fromUserName = xmlData.FromUserName;
+      const eventKey = xmlData.EventKey;
 
-      // 过滤掉异常数据
-      const [
-        sayLove,
-        caiHongpi,
-        oneWord,
-        songLyrics,
-        oneMagazines,
-        netEaseCloud,
-        dayEnglish,
-      ] = dataSource.map((n) => (n.status === 'fulfilled' ? n.value : null));
-
-      // 对象写法
-      const data: any = {
-        sayLove,
-        caiHongpi,
-        oneWord,
-        songLyrics,
-        oneMagazines,
-        netEaseCloud,
-        dayEnglish,
-      };
-
-      const template = this.templateService.textTemplate(data);
-      console.log('getGoodWord', template);
-
-      this.wecomService.wxNotify(template);
-    } catch (error) {
-      console.log('getGoodWord error:', error);
-    }
-  }
-
-  @EventPattern('get-joke')
-  async getJoke() {
-    const res: any = await this.tianApiService.getJoke();
-    let text = '今日份午安来喽:\n';
-    text += `请欣赏以下雷人笑话😝\n`;
-    text += `${res.map((n) => `『${n.title}』${n.content}`).join('\n\n')}`;
-    const template = {
-      msgtype: 'text',
-      text: {
-        content: text,
-      },
-    };
-
-    await this.wecomService.wxNotify(template);
-  }
-
-  @EventPattern('get-news')
-  async getNews() {
-    try {
-      // 每日简报
-      // const dailyBriefing = await this.tianApiService.getDailyBriefing()
-      // const formateData: TodayHeadlines[] = dailyBriefing.map((n) => ({
-      //   ...n,
-      //   title: n.title,
-      //   description: n.digest,
-      //   picUrl: n.imgsrc,
-      //   ctime: n.mtime,
-      // }))
-      // 今日头条
-      const todayTopNews: any = await this.tianApiService.getTianTopNews();
-      console.log('todayTopNews', todayTopNews.length);
-
-      // 每次信息最多8个
-      // 设定发送两次一共16个信息，数据如果不够则请求另一个接口
-      let result: any = [];
-      const len = todayTopNews.length;
-
-      if (len >= 16) {
-        // 则这条接口满足条件 2 * 8 = 16
-        result = todayTopNews.slice(0, 16);
-      } else {
-        // 取 0- 8 条
-        result = todayTopNews.slice(0, len >= 8 ? 8 : len);
-        // 数据不够，请求另一个接口
-        const dailyBriefing: any = await this.tianApiService.getDailyBriefing();
-        console.log('dailyBriefing', dailyBriefing.length);
-        const formateData = dailyBriefing.map((n) => ({
-          ...n,
-          title: n.title,
-          description: n.digest,
-          picUrl: n.imgsrc,
-          ctime: n.mtime,
-        }));
-
-        // 已经有8条
-        if (result.length === 8) {
-          result = [
-            ...result,
-            ...formateData.slice(
-              0,
-              formateData.length >= 8 ? 8 : formateData.length,
-            ),
-          ];
-        }
-
-        // 少于 8 条数据的情况
-        if (result.length < 8) {
-          const sencondLen = result.length + formateData.length;
-          if (sencondLen >= 16)
-            result = [...result, ...formateData.slice(result.length, 16)];
-          else
-            result = [
-              ...result,
-              ...formateData.slice(result.length, formateData.length),
-            ];
+      switch (xmlData.Event) {
+        case 'click': {
+          const button = this.wecomService.getMenuName[eventKey];
+          console.debug(
+            `${DebugId}-------->企微：${toUserName} 用户点击了${button}`,
+          );
+          await this.wecomService.handleEvent(
+            toUserName,
+            fromUserName,
+            eventKey,
+          );
+          break;
         }
       }
-
-      // 发送消息
-      const times = Math.ceil(result.length / 8);
-      for (let i = 0; i < times; i++) {
-        const start = 8 * i;
-        const end = 8 * i + 8 < result.length ? 8 * i + 8 : result.length;
-        console.log(result.length, start, end);
-
-        const template = this.templateService.newsTemplate(
-          result.slice(start, end),
-        );
-        await this.wecomService.wxNotify(template);
-      }
-    } catch (error) {
-      console.log('goodEvening', error);
+    } catch (error: any) {
+      console.error(
+        `${DebugId}-------->数据回调dataPostCallback error: ${error.stack}`,
+      );
+    } finally {
+      console.debug(
+        `${DebugId}-------->数据回调dataPostCallback end:${message}<--------`,
+      );
+      // return message;
+      return res.send(message);
     }
   }
 }

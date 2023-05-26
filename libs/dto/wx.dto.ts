@@ -25,3 +25,13 @@ type FnReqPostMsg<T = any> = (
   token: string,
   options: PostMsgOption,
 ) => Promise<T>;
+
+export class EventXmlDto {
+  ToUserName: string;
+  FromUserName: string;
+  CreateTime: string;
+  MsgType: string;
+  AgentID: string;
+  Event: string;
+  EventKey: string;
+}

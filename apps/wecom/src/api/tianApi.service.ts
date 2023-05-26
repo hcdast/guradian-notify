@@ -81,8 +81,8 @@ export class TianApiService {
     const url = `${TianApiURL.weather}?${queryString.stringify(params)}`;
     // 默认返回7天的数据，指定type只返回1天
     const res = await httpClient.get(url);
-    console.info('weather', res);
-    return res?.[0];
+    console.info('weather', res.data);
+    return res.data?.newslist[0];
   }
 
   /**
@@ -90,8 +90,13 @@ export class TianApiService {
    * @return {*}
    */
   async getDailyBriefing() {
-    const res = await httpClient.get<DailyBriefing[]>(TianApiURL.dailyBriefing);
-    return res;
+    const params = {
+      key: this.TIAN_API_KEY,
+    };
+    const url = `${TianApiURL.dailyBriefing}?${queryString.stringify(params)}`;
+    const res: any = await httpClient.get<DailyBriefing[]>(url);
+    if (res.data?.code != 200) return null;
+    return res.data?.newslist;
   }
 
   /**
@@ -99,8 +104,13 @@ export class TianApiService {
    * @return {*}
    */
   async getTianTopNews() {
-    const res = await httpClient.get<TodayHeadlines[]>(TianApiURL.topNews);
-    return res;
+    const params = {
+      key: this.TIAN_API_KEY,
+    };
+    const url = `${TianApiURL.topNews}?${queryString.stringify(params)}`;
+    const res: any = await httpClient.get<TodayHeadlines[]>(url);
+    if (res.data?.code != 200) return null;
+    return res.data?.newslist;
   }
 
   /**
@@ -108,8 +118,13 @@ export class TianApiService {
    * @return {*}
    */
   async getSongLyrics() {
-    const res = await httpClient.get<IVerseProps[]>(TianApiURL.songLyrics);
-    return res?.[0];
+    const params = {
+      key: this.TIAN_API_KEY,
+    };
+    const url = `${TianApiURL.songLyrics}?${queryString.stringify(params)}`;
+    const res: any = await httpClient.get<IVerseProps[]>(url);
+    if (res.data?.code != 200) return null;
+    return res.data?.newslist[0];
   }
 
   /**
@@ -117,8 +132,12 @@ export class TianApiService {
    * @return {*}
    */
   async getDayEnglish() {
-    const res = await httpClient.get<ResEnglishProps[]>(TianApiURL.dayEnglish);
-    return res?.[0];
+    const params = {
+      key: this.TIAN_API_KEY,
+    };
+    const url = `${TianApiURL.dayEnglish}?${queryString.stringify(params)}`;
+    const res: any = await httpClient.get<ResEnglishProps[]>(url);
+    return res.data?.newslist[0];
   }
 
   /**
@@ -135,8 +154,13 @@ export class TianApiService {
    * @return {*}
    */
   async getStorybook() {
-    const res = await httpClient.get<StorybookProps[]>(TianApiURL.storybook);
-    return res?.[0];
+    const params = {
+      key: this.TIAN_API_KEY,
+    };
+    const url = `${TianApiURL.storybook}?${queryString.stringify(params)}`;
+    const res: any = await httpClient.get<StorybookProps[]>(url);
+    if (res.data?.code != 200) return null;
+    return res.data?.newslist[0];
   }
 
   /**
@@ -161,8 +185,9 @@ export class TianApiService {
       key: this.TIAN_API_KEY,
     };
     const url = `${TianApiURL.lunarDate}?${queryString.stringify(params)}`;
-    const res = await httpClient.get<ResLunarDateProps[]>(url);
-    return res?.[0];
+    const res: any = await httpClient.get<ResLunarDateProps[]>(url);
+    if (res.data?.code != 200) return null;
+    return res.data;
   }
 
   /**
@@ -174,8 +199,9 @@ export class TianApiService {
       key: this.TIAN_API_KEY,
     };
     const url = `${TianApiURL.saylove}?${queryString.stringify(params)}`;
-    const res = await httpClient.get<SayloveProps[]>(url);
-    return res?.[0];
+    const res: any = await httpClient.get<SayloveProps[]>(url);
+    if (res.data?.code != 200) return null;
+    return res.data?.newslist[0];
   }
 
   /**
@@ -196,14 +222,14 @@ export class TianApiService {
    * @param {*} num
    * @return {*}
    */
-  async getJoke(num = 6): Promise<JokeProps[]> {
+  async getJoke(num = 1): Promise<JokeProps[]> {
     const params = {
       key: this.TIAN_API_KEY,
       num,
     };
     const url = `${TianApiURL.joke}?${queryString.stringify(params)}`;
     const res = await httpClient.get(url);
-    return res.data?.newslist;
+    return res.data?.newslist[0];
   }
 
   /**
@@ -211,15 +237,13 @@ export class TianApiService {
    * @return {*}
    */
   async getOneWord(): Promise<OneWordProps | null> {
-    try {
-      const response = await axios(TianApiURL.oneWord, {
-        timeout: 60000,
-      });
-      return response.data;
-    } catch (error) {
-      console.warn(error);
-      return null;
-    }
+    const params = {
+      key: this.TIAN_API_KEY,
+    };
+    const url = `${TianApiURL.oneWord}?${queryString.stringify(params)}`;
+    const res = await httpClient.get(url);
+    if (res.status != 200) return null;
+    return res.data;
   }
 
   /**

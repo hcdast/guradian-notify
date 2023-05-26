@@ -4,7 +4,7 @@
  * @Date: 2023-05-15 14:50:54
  * @Description:
  */
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 

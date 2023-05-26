@@ -9,7 +9,7 @@ import * as process from 'process';
 import { readFileSync } from 'fs';
 import { v4 } from 'uuid';
 import { xml2json } from 'xml-js';
-import _ from 'lodash';
+import * as _ from 'lodash';
 
 export function MD5(str: string) {
   return createHash('md5').update(str).digest('hex');
