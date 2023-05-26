@@ -43,7 +43,7 @@ export class WecomController {
    * @param {any} res
    * @return {*}
    */
-  @Get('/wecom/callback/data')
+  @Get('/callback/data')
   @HttpCode(200)
   async dataGetCallback(@Req() req: Request, @Res() res: Response) {
     const query = req.query;
@@ -74,7 +74,7 @@ export class WecomController {
    * @param {any} res
    * @return {*}
    */
-  @Post('/wecom/callback/data')
+  @Post('/callback/data')
   @HttpCode(200)
   async dataPostCallback(@Req() req: Request, @Res() res: Response) {
     const { msg_signature, timestamp, nonce } = req.query;
