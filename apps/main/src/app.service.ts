@@ -23,11 +23,19 @@ export class AppService implements OnApplicationBootstrap {
   }
 
   async onApplicationBootstrap() {
+    console.debug('--------定时器--------');
     const job = new CronJob('0 0 0 * * *', async () => {
-      console.info('send date');
+      console.info('daily reminder');
       await this.wecomService.dailyReminder();
     });
-    this.schedulerRegistry.addCronJob('send date', job);
+    this.schedulerRegistry.addCronJob('daily reminder', job);
     job.start();
+
+    const morningjob = new CronJob('0 0 8 * * *', async () => {
+      console.info('get weather');
+      await this.wecomService.getWeather('今日天气');
+    });
+    this.schedulerRegistry.addCronJob('get weather', morningjob);
+    morningjob.start();
   }
 }

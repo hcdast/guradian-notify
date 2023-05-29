@@ -28,18 +28,4 @@ export class AppController {
     // return this.appService.getHello();
     this.client.emit('setHello', query.name);
   }
-
-  @Get('/data')
-  getData(@Query() query: any) {
-    switch (query.cmd) {
-      case 'getStory':
-        this.client.emit('get-story', '');
-        break;
-      case 'getJoke':
-        this.client.emit('get-joke', '');
-        break;
-      default:
-        break;
-    }
-  }
 }
