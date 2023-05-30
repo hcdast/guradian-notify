@@ -9,6 +9,7 @@ import { CONFIG } from 'libs/shared/shared.module';
 import { WecomApiService } from './api/wecomApi.service';
 import { TianApiService } from './api/tianApi.service';
 import * as _ from 'lodash';
+import * as fs from 'fs';
 import { getConfig } from '@app/common/getConfig';
 import { TemplateService } from './templates/template.service';
 import * as dayjs from 'dayjs';
@@ -49,14 +50,26 @@ export class WecomService implements OnApplicationBootstrap {
    * @return {*}
    */
   async onApplicationBootstrap() {
-    // const menus = await this.wecomApiService.getMenu();
-    // console.log(JSON.stringify(menus.button));
-    // for (const item of menus.button) {
-    //   for (const obj of item.sub_button) {
-    //     console.log(obj);
-    //   }
-    // }
-    // await this.getSaylove(null);
+    console.log('--------------');
+  }
+
+  /**
+   * @description: 初始化文件上传
+   * @return {*}
+   */
+  async initFileUpload() {
+    const files = await fs.readdirSync(process.cwd() + '/imags/', {
+      withFileTypes: true,
+    });
+    for (const obj of files) {
+      const result = await this.wecomApiService.upload(
+        process.cwd() + '/imags/' + obj.name,
+      );
+      console.log(JSON.stringify(result));
+
+      this.templateService.thumbMediaIds.push(result.media_id);
+    }
+    console.debug(`thumbMediaIds:`, this.templateService);
   }
 
   getMenuName(key) {

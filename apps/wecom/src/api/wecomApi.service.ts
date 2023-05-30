@@ -5,9 +5,12 @@
  * @Description: 企业微信服务端api
  */
 import { Inject, Injectable } from '@nestjs/common';
-import _ from 'lodash';
+import * as _ from 'lodash';
+import * as fs from 'fs';
+import * as FormData from 'form-data';
 import { httpClient } from '@app/common';
 import { CONFIG } from 'libs/shared/shared.module';
+import * as http from 'http';
 
 @Injectable()
 export class WecomApiService {
@@ -112,6 +115,24 @@ export class WecomApiService {
       if (response.data?.errcode === 0) console.log('🎉发送成功！！！');
     } catch (error) {
       console.log(`发送失败 => ${error}`);
+    }
+  }
+
+  async upload(fileUrl: string, type = 'image') {
+    try {
+      const accessToken = await this.getAccessToken();
+      const url = `${this.BASE_URL}/cgi-bin/media/upload?access_token=${accessToken}&type=${type}`;
+      const form = new FormData();
+      form.append('file', fs.createReadStream(fileUrl));
+      const response = await httpClient.post(url, form, {
+        headers: form.getHeaders(),
+      });
+      if (response.data?.errcode === 0) {
+        console.log('上传成功！！！');
+        return response.data;
+      }
+    } catch (error) {
+      console.log(`上传失败 => ${error}`);
     }
   }
 }

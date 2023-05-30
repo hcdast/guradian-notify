@@ -8,8 +8,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { CONFIG, SharedModule } from 'libs/shared/shared.module';
-import { WecomModule } from 'apps/wecom/src/wecom.module';
+import { SharedModule } from 'libs/shared/shared.module';
 import { WecomService } from 'apps/wecom/src/wecom.service';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { WecomApiService } from 'apps/wecom/src/api/wecomApi.service';
@@ -19,7 +18,6 @@ import { JuheApiService } from 'apps/wecom/src/api/juheApi.service';
 
 @Module({
   imports: [
-    WecomModule,
     SharedModule,
     ClientsModule.register([
       {

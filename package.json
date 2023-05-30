@@ -37,6 +37,7 @@
     "class-validator": "^0.14.0",
     "cron": "^2.3.1",
     "dayjs": "^1.11.7",
+    "form-data": "^4.0.0",
     "hashids": "^2.2.11",
     "helmet": "^7.0.0",
     "moment": "^2.29.4",

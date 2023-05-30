@@ -26,20 +26,10 @@ interface ArticlesProps {
 @Injectable()
 export class TemplateService {
   private readonly msgConfig: any;
-  private readonly thumbMediaIds: any;
+  public thumbMediaIds: any;
   constructor(@Inject(CONFIG) private readonly config: any) {
     this.msgConfig = getConfig().loveMsg;
-    this.thumbMediaIds = [
-      '3i3-YOVOqcbMJaCAJpgCvXwmUbqyZIfIkGKKOTkcnwYurFGfbJ7Dl-EeufirDlhmq',
-      '3EOa2keBC2v0RBCo4xK0ZrYNSKhS5f_-TYTtnpWBB4KNS8_NpmfzhdsPFdEJtyjRY',
-      '3RSUcklZIBL_3fvypgP-CN6BIwbJneE0ZczYCOHAf2Gyb23XMcNl5SjmBLRUvlPMf',
-      '3J0i78dCZJJ5F50aG963VtCPMjKvkvcAqZ_RIk1O72sf7BIT3DWKMWH1QfklpXQVv',
-      '3F1WxvyIDdRl_o1_I9lrXuxsS0lLHOsV1DlhDLlQR7jaUQmu7v-HlKVqMmYwfNPgA',
-      '3fL2CUqGijdIWO6Ryy7BoL2ZFr6xxdNgUs1Ucvy-TaQTW18M_gEUVov47-54OR7CF',
-      '3dXVNKgTexI-1jZADFFjms4uJURNvtjZlGd_d4AR4_L6moFBP-RsltXRH_hhF4Yle',
-      '3myR1XgbjllN2gMiY4aMSJZF7gy20JW6bjxhAeETTLQDOW-c3sqoGBQtP3vScs0v3',
-      '3B2K8aYGI7muMMYZCZjcNb3LahFjurou_YYrHYIAW0z1jIA1ZbkBXNyMY3VZjsSEh',
-    ];
+    this.thumbMediaIds = [];
   }
 
   /**

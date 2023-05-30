@@ -27,6 +27,7 @@ export class AppService implements OnApplicationBootstrap {
     const job = new CronJob('0 0 0 * * *', async () => {
       console.info('daily reminder');
       await this.wecomService.dailyReminder();
+      await this.wecomService.initFileUpload();
     });
     this.schedulerRegistry.addCronJob('daily reminder', job);
     job.start();
