@@ -14,9 +14,10 @@ import { EventPatternController } from './eventPattern.controller';
 import { MessagePatternController } from './messagePattern.controller';
 import { WecomApiService } from './api/wecomApi.service';
 import { JuheApiService } from './api/juheApi.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [SharedModule],
+  imports: [SharedModule, ScheduleModule.forRoot()],
   controllers: [
     WecomController,
     EventPatternController,

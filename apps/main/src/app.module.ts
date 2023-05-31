@@ -9,13 +9,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SharedModule } from 'libs/shared/shared.module';
-import { ScheduleModule } from '@nestjs/schedule';
 import { WecomModule } from 'apps/wecom/src/wecom.module';
 
 @Module({
   imports: [
     WecomModule,
-    ScheduleModule.forRoot(),
     SharedModule,
     ClientsModule.register([
       {
