@@ -13,8 +13,6 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { WecomApiService } from './api/wecomApi.service';
-import { getConfig } from '@app/common/getConfig';
 import { WecomService } from './wecom.service';
 import { getUid, parserXml2Json } from '@app/common';
 import { EventXmlDto } from 'libs/dto/wx.dto';
@@ -34,7 +32,7 @@ export class WecomController {
   ) {
     this.Token = this.config.wecom?.token;
     this.EncodingAESKey = this.config.wecom?.encodingAESKey;
-    this.msgConfig = getConfig().loveMsg;
+    this.msgConfig = config.loveMsg;
   }
 
   /**

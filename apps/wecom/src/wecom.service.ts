@@ -10,14 +10,15 @@ import { WecomApiService } from './api/wecomApi.service';
 import { TianApiService } from './api/tianApi.service';
 import * as _ from 'lodash';
 import * as fs from 'fs';
-import { getConfig } from '@app/common/getConfig';
 import { TemplateService } from './templates/template.service';
 import * as dayjs from 'dayjs';
+import { CronJob } from 'cron';
 import * as moment from 'moment';
 import { JuheApiService } from './api/juheApi.service';
 import { getRandomRange } from '@app/common/utils';
 import { getContentByDay } from './templates/memorial';
 import { getCustomMessage } from './templates/customMessage';
+import { SchedulerRegistry } from '@nestjs/schedule';
 
 @Injectable()
 export class WecomService implements OnApplicationBootstrap {
@@ -29,8 +30,9 @@ export class WecomService implements OnApplicationBootstrap {
     private readonly tianApiService: TianApiService,
     private readonly juheApiService: JuheApiService,
     private readonly templateService: TemplateService,
+    private schedulerRegistry: SchedulerRegistry,
   ) {
-    this.msgConfig = getConfig().loveMsg;
+    this.msgConfig = this.config.loveMsg;
     this.MENU_MAP = {
       '#sendmsg#_0_0#7599824568204778': '今日天气',
       '#sendmsg#_0_1#7599824568204779': '今日日期',
@@ -50,7 +52,21 @@ export class WecomService implements OnApplicationBootstrap {
    * @return {*}
    */
   async onApplicationBootstrap() {
-    console.log('--------------');
+    console.debug('--------定时器--------');
+    const job = new CronJob('0 0 0 * * *', async () => {
+      console.info('daily reminder');
+      await this.dailyReminder();
+      await this.initFileUpload();
+    });
+    this.schedulerRegistry.addCronJob('daily reminder', job);
+    job.start();
+
+    const morningjob = new CronJob('0 0 8 * * *', async () => {
+      console.info('get weather');
+      await this.getWeather('今日天气');
+    });
+    this.schedulerRegistry.addCronJob('get weather', morningjob);
+    morningjob.start();
   }
 
   /**

@@ -10,6 +10,7 @@ import { readFileSync } from 'fs';
 import { v4 } from 'uuid';
 import { xml2json } from 'xml-js';
 import * as _ from 'lodash';
+import * as JSON5 from 'json5';
 
 export function MD5(str: string) {
   return createHash('md5').update(str).digest('hex');
@@ -25,7 +26,7 @@ export async function sleep(duration: number) {
 
 export function loadJsonFile(file: string) {
   const content = readFileSync(file);
-  return JSON.parse(content.toString());
+  return JSON5.parse(content.toString());
 }
 
 export function SHA1(str: string) {

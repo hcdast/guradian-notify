@@ -18,7 +18,9 @@ export const CONFIG = '##CONFIG##';
       provide: CONFIG,
       useFactory: () => {
         try {
-          return loadJsonFile(resolve(process.cwd(), 'config/config.app.json'));
+          return loadJsonFile(
+            resolve(process.cwd(), 'config/config.app.json5'),
+          );
         } catch (e) {
           console.error(e);
           process.exit(1);

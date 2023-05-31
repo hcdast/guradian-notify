@@ -1,15 +1,8 @@
-import { getRandomRange } from '@app/common';
-import dayjs from '@app/common/dayjs';
-import { getConfig } from '@app/common/getConfig';
 import { Inject, Injectable } from '@nestjs/common';
 import { CONFIG } from 'libs/shared/shared.module';
 import { getCustomMessage } from './customMessage';
 import { getContentByDay } from './memorial';
-import {
-  TextCardTemplateProps,
-  TextTemplateProps,
-  TodayHeadlines,
-} from 'libs/dto/message.dto';
+import { TextCardTemplateProps, TodayHeadlines } from 'libs/dto/message.dto';
 
 interface ArticlesProps {
   title: string;
@@ -28,7 +21,7 @@ export class TemplateService {
   private readonly msgConfig: any;
   public thumbMediaIds: any;
   constructor(@Inject(CONFIG) private readonly config: any) {
-    this.msgConfig = getConfig().loveMsg;
+    this.msgConfig = this.config.loveMsg;
     this.thumbMediaIds = [];
   }
 

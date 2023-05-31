@@ -4,19 +4,10 @@
  * @Date: 2023-05-13 10:57:00
  * @Description:
  */
-import {
-  Controller,
-  Get,
-  HttpCode,
-  Inject,
-  Post,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Controller, Inject } from '@nestjs/common';
 import { WecomApiService } from './api/wecomApi.service';
-import { EventPattern, MessagePattern } from '@nestjs/microservices';
+import { EventPattern } from '@nestjs/microservices';
 import { TianApiService } from './api/tianApi.service';
-import { getConfig } from '@app/common/getConfig';
 import { TemplateService } from './templates/template.service';
 import { CONFIG } from 'libs/shared/shared.module';
 import { WecomService } from './wecom.service';
@@ -31,7 +22,7 @@ export class EventPatternController {
     private readonly tianApiService: TianApiService,
     private readonly templateService: TemplateService,
   ) {
-    this.msgConfig = getConfig().loveMsg;
+    this.msgConfig = config.loveMsg;
   }
 
   @EventPattern('get-weather')
