@@ -40,6 +40,7 @@
     "form-data": "^4.0.0",
     "hashids": "^2.2.11",
     "helmet": "^7.0.0",
+    "json5": "^2.2.3",
     "moment": "^2.29.4",
     "nest-winston": "^1.9.2",
     "query-string": "^8.1.0",
