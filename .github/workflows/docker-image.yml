@@ -14,7 +14,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: pkg
+    - name: Pack the binaries
       run: npm install -g pkg@5.5.1 && pkg .
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag guradian-notify:$(date +%s)
