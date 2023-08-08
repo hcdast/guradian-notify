@@ -14,5 +14,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: pkg
+      run: pkg .
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag guradian-notify:$(date +%s)
